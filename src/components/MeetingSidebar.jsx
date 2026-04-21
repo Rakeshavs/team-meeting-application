@@ -17,7 +17,6 @@ export default function MeetingSidebar({ onClose }) {
 
   return (
     <>
-      {/* Persistent backdrop when sidebar is open */}
       <div 
         className="fixed inset-0 bg-black/30 backdrop-blur-[2px] z-40 transition-opacity animate-in fade-in duration-300" 
         onClick={onClose}

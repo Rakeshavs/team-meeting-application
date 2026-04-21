@@ -113,13 +113,11 @@ export default function MeetingRoom() {
     const prefs = getMeetingPreferences();
     const targetLang = prefs.language || 'english';
     
-    // Configure for the speaker's language (default to English for recognition)
     liveCaptionService.setLanguage('en-US');
 
     const handleCaptionResult = async ({ interim, final }) => {
       if (!isCaptionsOn) return;
 
-      // 1. Show interim/final results locally for immediate feedback
       setActiveCaptions((prev) => ({
         ...prev,
         me: {
@@ -130,7 +128,6 @@ export default function MeetingRoom() {
         },
       }));
 
-      // 2. When a sentence is final, broadcast it
       if (final) {
         sendCaptionMessage(final);
       }
@@ -150,7 +147,6 @@ export default function MeetingRoom() {
 
   return (
     <div className="h-screen w-full bg-gray-900 flex flex-col overflow-hidden text-white font-sans">
-      {/* Top Header */}
       <header className="w-full p-4 flex items-center justify-between border-b border-gray-800 bg-gray-900/90 backdrop-blur z-10">
         <div className="flex items-center gap-3">
           <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse border border-red-400"></div>
@@ -165,10 +161,8 @@ export default function MeetingRoom() {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden p-4 relative w-full h-full gap-4">
         
-        {/* Main Video Grid */}
         <div className={`flex-1 flex flex-col transition-all duration-300 ${isChatOpen ? 'pr-0 md:pr-4 md:w-3/4' : 'w-full'}`}>
           <div className="flex-1 rounded-2xl overflow-hidden flex items-center justify-center p-2">
             {!localStream ? (
@@ -222,7 +216,6 @@ export default function MeetingRoom() {
             )}
           </div>
           
-          {/* Floating Action Menu aligned bottom center */}
           <MeetingControls 
             roomId={roomId}
             onToggleVideo={toggleVideo}
@@ -246,7 +239,6 @@ export default function MeetingRoom() {
           />
         </div>
 
-        {/* Sliding Chat Sidebar */}
         {isChatOpen && (
           <aside className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-800 border-l border-gray-700 flex flex-col shadow-2xl md:relative md:rounded-xl md:my-2 md:mr-2">
             <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800 rounded-t-xl">
@@ -293,7 +285,6 @@ export default function MeetingRoom() {
           </aside>
         )}
 
-        {/* Sliding People/Lobby Sidebar */}
         {isPeopleOpen && (
           <aside className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-800 border-l border-gray-700 flex flex-col shadow-2xl md:relative md:rounded-xl md:my-2 md:mr-2">
             <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800 rounded-t-xl">
@@ -302,7 +293,6 @@ export default function MeetingRoom() {
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              {/* Waiting Room / Lobby Section */}
               {isHost && (
                 <div>
                   <div className="flex justify-between items-center mb-3">
@@ -344,7 +334,6 @@ export default function MeetingRoom() {
                 </div>
               )}
 
-              {/* In Call Section */}
               <div>
                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider text-xs mb-3">In Call</h3>
                 <div className="space-y-3">
@@ -373,7 +362,6 @@ export default function MeetingRoom() {
           </aside>
         )}
 
-        {/* Join Requests Overlay (for Host) - Kept as a toast-like notification if sidebar is closed */}
         {isHost && activeJoinRequests.length > 0 && !isPeopleOpen && (
           <div className="fixed top-20 right-4 z-50 w-72 animate-in slide-in-from-right duration-500">
             <div className="bg-white rounded-2xl shadow-2xl p-4 border border-gray-200">

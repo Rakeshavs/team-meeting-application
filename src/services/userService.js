@@ -1,8 +1,8 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { buildApiUrl } from '../utils/api';
 
 export async function saveUser(user) {
-  // 1. Existing Firebase save (Keeping as backup)
   try {
     await setDoc(doc(db, 'users', user.id), {
       name: user.name,
@@ -13,9 +13,8 @@ export async function saveUser(user) {
     console.warn('Firebase user save failed, continuing to Supabase...', error);
   }
 
-  // 2. New Supabase Sync via Backend
   try {
-    const response = await fetch('http://localhost:8000/api/users/sync', {
+    const response = await fetch(buildApiUrl('/api/users/sync'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
