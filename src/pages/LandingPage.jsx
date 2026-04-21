@@ -10,6 +10,7 @@ import illustration from '../assets/illustration.png';
 import { buildApiUrl } from '../utils/api';
 
 export default function LandingPage() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [meetingCode, setMeetingCode] = useState('');
   const [participantName, setParticipantName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -129,12 +130,15 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <MeetingHeader onOpenChatbot={() => setIsChatbotOpen(true)} />
+      <MeetingHeader 
+  onOpenChatbot={() => setIsChatbotOpen(true)}
+  toggleSidebar={() => setIsSidebarOpen(prev => !prev)}
+/>
       
       <div className="flex flex-1 overflow-hidden">
-        <MeetingSidebar />
+        {isSidebarOpen && <MeetingSidebar />}
         
-        <main className="flex-1 flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-12 gap-12 overflow-y-auto">
+        <main className="flex-1 flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-12 gap-12 overflow-y-auto ml-[60px]">
           {/* Left Column: Call to Action */}
           <div className="flex-1 max-w-xl text-left">
             <h1 className="text-4xl md:text-5xl font-normal text-gray-800 leading-tight mb-6">

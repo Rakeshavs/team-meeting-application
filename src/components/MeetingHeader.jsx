@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getMeetingPreferences, getTranslator, saveMeetingPreferences } from '../utils/meetingUtils';
 
-export default function MeetingHeader({ onOpenChatbot }) {
+export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentTime, setCurrentTime] = useState(() => format(new Date(), 'HH:mm - EEE, d MMM'));
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const [availableDevices, setAvailableDevices] = useState({ microphones: [], cameras: [] });
   const [expandedPicker, setExpandedPicker] = useState(null);
   const [meetingPreferences, setMeetingPreferences] = useState(getMeetingPreferences);
@@ -86,7 +86,7 @@ export default function MeetingHeader({ onOpenChatbot }) {
       <header className="flex items-center justify-between px-4 py-2 bg-white text-gray-700 border-b border-gray-100 h-16 shadow-sm relative z-20">
         <div className="flex items-center gap-2">
         <button
-          onClick={() => setIsMenuOpen((prev) => !prev)}
+          onClick={toggleSidebar}
           className="p-2 hover:bg-gray-100 rounded-full"
         >
           <Menu size={24} />
@@ -184,22 +184,8 @@ export default function MeetingHeader({ onOpenChatbot }) {
           </div>
         </div>
       </header>
-      {isMenuOpen && (
-  <div className="absolute top-16 left-4 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
-    <nav className="flex flex-col p-2">
-      {navigationItems.map((item, index) => (
-        <NavLink
-          key={index}
-          to={item.to}
-          onClick={() => setIsMenuOpen(false)}
-          className="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100"
-        >
-          {item.label}
-        </NavLink>
-      ))}
-    </nav>
-  </div>
-)}
+      
+
 
       {isHelpOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
