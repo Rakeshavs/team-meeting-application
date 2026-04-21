@@ -77,8 +77,8 @@ export default function MeetingHeader({ onOpenChatbot }) {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem("user");
+    window.location.href = "/login";
   };
 
   return (

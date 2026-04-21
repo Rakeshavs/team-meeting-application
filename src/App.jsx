@@ -20,7 +20,7 @@ function App() {
 
   useEffect(() => {
     const syncUser = () => {
-      setUser(JSON.parse(localStorage.getItem('user')));
+      setUser(() => JSON.parse(localStorage.getItem('user')));
     };
 
     window.addEventListener('storage', syncUser);

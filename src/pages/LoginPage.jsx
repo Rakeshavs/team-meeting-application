@@ -63,38 +63,11 @@ export default function LoginPage() {
       <div className="backdrop-blur-xl bg-white/70 border border-white/30 w-[380px] p-8 rounded-3xl shadow-xl">
         <h1 className="text-2xl font-semibold text-center mb-6 text-gray-800">Welcome</h1>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Enter your Gmail"
-            value={email}
-            required
-            onChange={(event) => setEmail(event.target.value)}
-            className="px-4 py-3 rounded-xl bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-800"
-          />
+        
 
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            required
-            onChange={(event) => setPassword(event.target.value)}
-            className="px-4 py-3 rounded-xl bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-800"
-          />
+          
 
-          <button
-            type="submit"
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white py-3 rounded-xl transition shadow-lg"
-          >
-            Login
-          </button>
-        </form>
-
-        <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="text-gray-400 text-sm">OR</span>
-          <div className="flex-1 h-px bg-gray-300"></div>
-        </div>
+      
 
         <div className="flex justify-center">
           <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => console.log('Login Failed')} />
