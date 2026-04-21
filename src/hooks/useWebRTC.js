@@ -35,6 +35,18 @@ function getDisplayName(roomId, isHost) {
     return existingName;
   }
 
+  // 1. Try to get name from logged-in user
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.name) {
+      sessionStorage.setItem(storageKey, user.name);
+      return user.name;
+    }
+  } catch (e) {
+    console.debug('No logged in user for display name');
+  }
+
+  // 2. Fallback to generated name
   const generatedName = isHost ? 'Host' : `Participant ${getStableClientId(roomId).slice(-4).toUpperCase()}`;
   sessionStorage.setItem(storageKey, generatedName);
   return generatedName;

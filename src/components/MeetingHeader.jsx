@@ -83,7 +83,7 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
 
   return (
     <>
-      <header className="flex items-center justify-between px-4 py-2 bg-white text-gray-700 border-b border-gray-100 h-16 shadow-sm relative z-20">
+      <header className="flex items-center justify-between px-4 py-2 bg-white text-gray-700 border-b border-gray-100 h-16 shadow-sm relative z-[60]">
         <div className="flex items-center gap-2">
         <button
           onClick={toggleSidebar}
@@ -156,7 +156,7 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 top-12 w-72 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
+                <div className="absolute right-0 top-12 w-72 rounded-[2rem] border border-gray-200 bg-white p-6 shadow-xl">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-full bg-emerald-600 overflow-hidden flex items-center justify-center">
                       {user?.picture ? (
@@ -173,7 +173,7 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
 
                   <button
                     onClick={handleLogout}
-                    className="mt-4 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+                    className="mt-4 flex w-full items-center gap-2 rounded-full px-5 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50"
                   >
                     <LogOut size={16} />
                     Logout
@@ -189,8 +189,8 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
 
       {isHelpOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-xl shadow-2xl">
-            <div className="flex justify-between items-start mb-6">
+          <div className="bg-white rounded-[3rem] p-8 w-full max-w-xl shadow-2xl">
+            <div className="flex justify-between items-start mb-6 px-2">
               <div>
                 <h2 className="text-2xl font-semibold text-gray-800">{t('help')}</h2>
                 <p className="text-sm text-gray-500 mt-1">{t('helpSubtext')}</p>
@@ -201,22 +201,22 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-xl border border-gray-200 p-4">
+              <div className="rounded-full border border-gray-200 px-8 py-4">
                 <div className="font-medium text-gray-800 mb-1">{t('joinMeetingHelp')}</div>
                 <div className="text-sm text-gray-500">{t('joinMeetingHelpText')}</div>
               </div>
-              <div className="rounded-xl border border-gray-200 p-4">
+              <div className="rounded-full border border-gray-200 px-8 py-4">
                 <div className="font-medium text-gray-800 mb-1">{t('presentHelp')}</div>
                 <div className="text-sm text-gray-500">{t('presentHelpText')}</div>
               </div>
-              <div className="rounded-xl border border-gray-200 p-4">
+              <div className="rounded-[2.5rem] border border-gray-200 px-8 py-5">
                 <div className="font-medium text-gray-800 mb-1">{t('moreAssistance')}</div>
                 <button
                   onClick={() => {
                     setIsHelpOpen(false);
                     handleOpenChatbot();
                   }}
-                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                  className="mt-3 inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
                 >
                   <MessageSquare size={16} />
                   {t('chatbotSupport')}
@@ -229,8 +229,8 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
 
       {isSettingsOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
+          <div className="bg-white rounded-[3rem] p-8 w-full max-w-lg shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6 border-b border-gray-100 pb-4 px-2">
               <div className="flex items-center gap-3">
                 <Settings className="text-blue-600" size={24} />
                 <h2 className="text-2xl font-semibold text-gray-800">{t('settings')}</h2>
@@ -241,7 +241,7 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-start gap-3">
+              <div className="bg-blue-50 px-8 py-5 rounded-[2.5rem] border border-blue-100 flex items-start gap-3">
                 <Info className="text-blue-600 mt-1 flex-shrink-0" size={20} />
                 <div>
                   <h3 className="font-semibold text-blue-900 mb-1">Shnoor International LLC Platform</h3>
@@ -303,7 +303,7 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
                   selectLabel={t('select')}
                 />
 
-                <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <div className="flex items-center justify-between px-6 py-4 border border-gray-200 rounded-full bg-gray-50">
                   <div className="flex items-center gap-3">
                     <Monitor className="text-gray-500" size={20} />
                     <div>
@@ -315,7 +315,7 @@ export default function MeetingHeader({ onOpenChatbot, toggleSidebar }) {
                   </div>
                   <button
                     onClick={() => updatePreference({ hardwareAcceleration: !meetingPreferences.hardwareAcceleration })}
-                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${meetingPreferences.hardwareAcceleration ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${meetingPreferences.hardwareAcceleration ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
                   >
                     {meetingPreferences.hardwareAcceleration ? t('on') : t('off')}
                   </button>
@@ -366,8 +366,8 @@ function DevicePreferenceCard({
   selectLabel,
 }) {
   return (
-    <div className="border border-gray-200 rounded-lg bg-gray-50">
-      <div className="flex items-center justify-between p-3 gap-4">
+    <div className="border border-gray-200 rounded-[2.5rem] bg-gray-50 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 gap-4">
         <div className="flex items-center gap-3 min-w-0">
           {icon}
           <div className="min-w-0">
@@ -378,7 +378,7 @@ function DevicePreferenceCard({
         <div className="flex items-center gap-2">
           <button
             onClick={onToggleEnabled}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${toggleActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${toggleActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
           >
             {toggleLabel}
           </button>
@@ -389,12 +389,12 @@ function DevicePreferenceCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-gray-200 px-3 py-2 space-y-1 bg-white rounded-b-lg">
+        <div className="border-t border-gray-200 px-5 py-3 space-y-2 bg-white rounded-b-[2.5rem]">
           {options.map((option) => (
             <button
               key={option.deviceId}
               onClick={() => onSelect(option.deviceId)}
-              className="w-full flex items-center justify-between rounded-md px-3 py-2 text-sm text-left hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between rounded-full px-3 py-2 text-sm text-left hover:bg-gray-50 transition-colors"
             >
               <span className="text-gray-700">{option.label}</span>
               {selectedId === option.deviceId && <Check size={16} className="text-blue-600" />}
@@ -406,10 +406,10 @@ function DevicePreferenceCard({
   );
 }
 
-function OptionRow({ title, value, options, selectedValue, onSelect }) {
+export function OptionRow({ title, value, options, selectedValue, onSelect }) {
   return (
-    <div className="border border-gray-200 rounded-lg bg-gray-50 p-3">
-      <div className="flex items-center justify-between mb-3">
+    <div className="border border-gray-200 rounded-[2.5rem] bg-gray-50 px-6 py-5 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <div className="text-sm font-medium text-gray-800">{title}</div>
           <div className="text-xs text-gray-500">{value}</div>
@@ -420,7 +420,7 @@ function OptionRow({ title, value, options, selectedValue, onSelect }) {
           <button
             key={option.value}
             onClick={() => onSelect(option.value)}
-            className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${selectedValue === option.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
+            className={`rounded-full border px-3 py-2 text-sm font-medium transition-colors ${selectedValue === option.value ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}
           >
             {option.label}
           </button>

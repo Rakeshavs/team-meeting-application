@@ -9,6 +9,8 @@ export default function CallsPage() {
   const [callHistory, setCallHistory] = useState(getCallHistory);
   const [tick, setTick] = useState(Date.now());
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   useEffect(() => {
     const loadHistory = () => setCallHistory(getCallHistory());
     const interval = window.setInterval(() => {
@@ -31,18 +33,18 @@ export default function CallsPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <MeetingHeader />
+      <MeetingHeader toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
 
       <div className="flex flex-1 overflow-hidden">
-        <MeetingSidebar />
+        {isSidebarOpen && <MeetingSidebar onClose={() => setIsSidebarOpen(false)} />}
 
         <main className="flex-1 flex flex-col items-center bg-white overflow-y-auto pt-8 px-4 md:px-0">
-          <div className="w-full max-w-2xl bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] border border-gray-100 rounded-2xl p-4 mb-12 flex items-center gap-4 group transition-all hover:shadow-lg focus-within:ring-2 focus-within:ring-blue-100">
+          <div className="w-full max-w-2xl bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 rounded-full px-8 py-4 mb-12 flex items-center gap-4 group transition-all hover:shadow-lg focus-within:ring-4 focus-within:ring-blue-50">
             <Search className="text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
             <input
               type="text"
               placeholder="Search participants or room code"
-              className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 font-medium"
+              className="flex-1 bg-transparent border-none outline-none text-gray-800 placeholder-gray-400 font-medium text-lg"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
@@ -60,7 +62,7 @@ export default function CallsPage() {
                 return (
                   <div
                     key={call.sessionId}
-                    className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm"
+                    className="bg-white p-8 rounded-[3.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start gap-4">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${call.role === 'host' ? 'bg-blue-600' : 'bg-emerald-600'}`}>
@@ -69,10 +71,17 @@ export default function CallsPage() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                          <div>
-                            <div className="text-gray-800 font-semibold">{call.name || 'Participant'}</div>
-                            <div className="text-xs text-gray-500 uppercase tracking-wider mt-1">
-                              {call.role === 'host' ? 'Host' : 'Participant'} - Room {call.roomId}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-3">
+                              <div className="text-gray-800 font-bold text-xl">{call.name || 'Participant'}</div>
+                              {call.role === 'host' && (
+                                <span className="bg-blue-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+                                  Host
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-400 font-medium tracking-wide">
+                              Room ID: <span className="text-gray-600 font-bold">{call.roomId}</span>
                             </div>
                           </div>
                           <div className="inline-flex items-center gap-2 text-sm text-gray-500">
@@ -110,9 +119,9 @@ export default function CallsPage() {
 
 function InfoBlock({ label, value }) {
   return (
-    <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
-      <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{label}</div>
-      <div className="text-gray-700 font-medium">{value}</div>
+    <div className="rounded-full bg-gray-50 border border-gray-100 px-8 py-4">
+      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{label}</div>
+      <div className="text-gray-800 font-semibold">{value}</div>
     </div>
   );
 }

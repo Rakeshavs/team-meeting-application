@@ -61,16 +61,30 @@ export default function LoginPage() {
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-blue-100 to-purple-100">
       <div className="backdrop-blur-xl bg-white/70 border border-white/30 w-[380px] p-8 rounded-3xl shadow-xl">
-        <h1 className="text-2xl font-semibold text-center mb-6 text-gray-800">Welcome</h1>
+        <div className="flex justify-center mb-8">
+          <div 
+            style={{ backgroundColor: 'white', borderColor: '#e5e7eb' }}
+            className="border px-10 py-3 rounded-full shadow-sm transform hover:scale-105 transition-all cursor-default"
+          >
+            <h1 
+              style={{ color: 'black' }}
+              className="text-2xl font-bold text-center tracking-tight"
+            >
+              Welcome
+            </h1>
+          </div>
+        </div>
 
-        
-
-          
-
-      
+        <div className="p-4" />
 
         <div className="flex justify-center">
-          <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => console.log('Login Failed')} />
+          <GoogleLogin 
+            onSuccess={handleGoogleSuccess} 
+            onError={() => console.log('Login Failed')} 
+            shape="pill"
+            theme="outline"
+            size="large"
+          />
         </div>
       </div>
     </div>

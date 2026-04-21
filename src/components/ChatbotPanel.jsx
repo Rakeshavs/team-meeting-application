@@ -133,7 +133,7 @@ export default function ChatbotPanel({ onClose }) {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 w-[340px] h-[520px] bg-[#f8fafc] rounded-2xl shadow-xl flex flex-col overflow-hidden border border-gray-200">
+    <div className="fixed bottom-6 right-6 w-[340px] h-[520px] bg-[#f8fafc] rounded-[2.5rem] shadow-xl flex flex-col overflow-hidden border border-gray-200 chatbot-container">
 
       <div className="bg-[#2563eb] text-white px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export default function ChatbotPanel({ onClose }) {
               <div
                 key={i}
                 onClick={() => handleTopicClick(t)}
-                className="bg-white border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-blue-50 text-gray-800 font-medium"
+                className="bg-white border border-gray-200 rounded-full px-5 py-3 cursor-pointer hover:bg-blue-50 text-gray-800 font-medium chatbot-topic-btn"
               >
                 {t}
               </div>
@@ -174,7 +174,7 @@ export default function ChatbotPanel({ onClose }) {
                 <div
                   key={i}
                   onClick={() => handleQuestionClick(q)}
-                  className="bg-white border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-blue-50 text-gray-800"
+                  className="bg-white border border-gray-200 rounded-full px-5 py-3 cursor-pointer hover:bg-blue-50 text-gray-800 chatbot-topic-btn"
                 >
                   {q}
                 </div>
@@ -193,14 +193,14 @@ export default function ChatbotPanel({ onClose }) {
               {selectedTopic}
             </h3>
 
-            <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 whitespace-pre-line">
+            <div className="bg-white border border-gray-200 rounded-3xl px-6 py-4 text-sm text-gray-800 whitespace-pre-line chatbot-answer-box">
               {selectedAnswer}
             </div>
 
             <div className="flex justify-end">
               <button
                 onClick={() => setStep("questions")}
-                className="bg-[#2563eb] text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+                className="bg-[#2563eb] text-white px-5 py-2.5 rounded-full text-sm hover:bg-blue-700"
               >
                 More Help
               </button>
@@ -209,14 +209,14 @@ export default function ChatbotPanel({ onClose }) {
             <div className="space-y-2">
               <div
                 onClick={() => setStep("topics")}
-                className="bg-white border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-gray-50 text-gray-700"
+                className="bg-white border border-gray-200 rounded-full px-5 py-3 cursor-pointer hover:bg-gray-50 text-gray-700 chatbot-topic-btn"
               >
                 Back to main menu
               </div>
 
               <div
                 onClick={() => navigate("/contact")}
-                className="bg-white border border-gray-200 rounded-xl px-4 py-3 cursor-pointer hover:bg-red-50 text-red-600 font-medium"
+                className="bg-white border border-gray-200 rounded-full px-5 py-3 cursor-pointer hover:bg-red-50 text-red-600 font-medium chatbot-topic-btn"
               >
                 Contact support
               </div>

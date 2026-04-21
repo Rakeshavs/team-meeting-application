@@ -12,8 +12,30 @@ body[data-theme='dark'] {
 }
 
 body[data-theme='dark'] .bg-white,
-body[data-theme='dark'] .bg-gray-50 {
+body[data-theme='dark'] .bg-gray-50,
+body[data-theme='dark'] .bg-blue-50 {
   background-color: #111827 !important;
+}
+
+body[data-theme='dark'] .hover\:bg-gray-50:hover,
+body[data-theme='dark'] .hover\:bg-gray-100:hover,
+body[data-theme='dark'] .hover\:bg-blue-50:hover {
+  background-color: #f0f7ff !important;
+  color: #1d4ed8 !important; /* Shnoor Dark Blue */
+}
+
+body[data-theme='dark'] .hover\:bg-gray-50:hover *,
+body[data-theme='dark'] .hover\:bg-gray-100:hover *,
+body[data-theme='dark'] .hover\:bg-blue-50:hover * {
+  color: #1d4ed8 !important;
+}
+
+body[data-theme='dark'] .bg-white/10:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body[data-theme='dark'] .group:hover .group-hover\:text-blue-600 {
+  color: #1d4ed8 !important;
 }
 
 body[data-theme='dark'] .bg-gray-100 {
@@ -55,4 +77,26 @@ body[data-theme='dark'] select {
 
 .google-blue-btn {
   @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-sm transition-all focus:ring-4 focus:ring-blue-100;
+}
+
+/* Chatbot Specific Dark Mode Overrides */
+body[data-theme='dark'] .chatbot-container {
+  background-color: #030712 !important;
+  border-color: #1f2937 !important;
+}
+
+body[data-theme='dark'] .chatbot-topic-btn {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+body[data-theme='dark'] .chatbot-topic-btn:hover {
+  background-color: #f0f7ff !important;
+  color: #000000 !important; /* Pitch Black */
+}
+
+body[data-theme='dark'] .chatbot-answer-box {
+  background-color: #111827 !important;
+  color: #f3f4f6 !important;
 }

@@ -7,6 +7,8 @@ import CalendarSidebar from '../components/CalendarSidebar';
 import { MonthView, WeekView, DayView } from '../components/CalendarViews';
 import EventModal from '../components/EventModal';
 import { buildApiUrl } from '../utils/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -15,6 +17,8 @@ export default function CalendarPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchEvents();
@@ -53,8 +57,9 @@ export default function CalendarPage() {
   };
 
   const handleSaveEvent = async (eventData) => {
-    const method = eventData.id ? 'PUT' : 'POST';
-    const url = eventData.id 
+    const isUpdate = !!eventData.id;
+    const method = isUpdate ? 'PUT' : 'POST';
+    const url = isUpdate 
       ? buildApiUrl(`/api/calendar/events/${eventData.id}`)
       : buildApiUrl('/api/calendar/events');
 
@@ -66,20 +71,37 @@ export default function CalendarPage() {
       });
 
       if (response.ok) {
+        setToast({ 
+          message: isUpdate ? 'Event updated successfully!' : 'Saved successfully!',
+          type: 'success'
+        });
+        setTimeout(() => setToast(null), 3000);
         fetchEvents();
         setIsModalOpen(false);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setToast({ 
+          message: `Server Error (${response.status}): ${errorData.detail || 'Internal server error'}`,
+          type: 'error'
+        });
+        setTimeout(() => setToast(null), 5000);
       }
     } catch (err) {
       console.error('Failed to save event:', err);
+      setToast({ 
+        message: `Network Error: ${err.message || 'Could not connect to server'}`,
+        type: 'error'
+      });
+      setTimeout(() => setToast(null), 5000);
     }
   };
 
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden text-gray-900">
-      <MeetingHeader />
+      <MeetingHeader toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
       
       <div className="flex flex-1 overflow-hidden">
-        <MeetingSidebar />
+        {isSidebarOpen && <MeetingSidebar onClose={() => setIsSidebarOpen(false)} />}
         <CalendarSidebar 
           currentDate={currentDate} 
           onDateSelect={setCurrentDate}
@@ -130,6 +152,28 @@ export default function CalendarPage() {
         onSave={handleSaveEvent}
         event={selectedEvent}
       />
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 50, x: '-50%' }}
+            className={`fixed bottom-12 left-1/2 z-[100] backdrop-blur-md text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 border ${
+              toast.type === 'error' 
+                ? 'bg-red-900/90 border-red-500/20' 
+                : 'bg-gray-900/90 border-white/10'
+            }`}
+          >
+            {toast.type === 'error' ? (
+              <AlertCircle className="text-red-400" size={24} />
+            ) : (
+              <CheckCircle2 className="text-emerald-400" size={24} />
+            )}
+            <span className="font-semibold">{toast.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

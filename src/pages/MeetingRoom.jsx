@@ -4,7 +4,8 @@ import { useWebRTC } from '../hooks/useWebRTC';
 import VideoGrid from '../components/VideoGrid';
 import MeetingControls from '../components/MeetingControls';
 import { Send, Users, Info, Video, Check, X } from 'lucide-react';
-import { transcribeAudioChunk } from '../services/groqService';
+import { liveCaptionService } from '../services/liveCaptionService';
+import { getMeetingPreferences } from '../utils/meetingUtils';
 
 export default function MeetingRoom() {
   const { id: roomId } = useParams();
@@ -105,66 +106,40 @@ export default function MeetingRoom() {
 
   useEffect(() => {
     if (!isCaptionsOn || !localStream) {
+      liveCaptionService.stop();
       return undefined;
     }
 
-    const audioTrack = localStream.getAudioTracks()[0];
-    if (!audioTrack) {
-      return undefined;
-    }
+    const prefs = getMeetingPreferences();
+    const targetLang = prefs.language || 'english';
+    
+    // Configure for the speaker's language (default to English for recognition)
+    liveCaptionService.setLanguage('en-US');
 
-    const audioStream = new MediaStream([audioTrack]);
+    const handleCaptionResult = async ({ interim, final }) => {
+      if (!isCaptionsOn) return;
 
-    const startChunkRecording = () => {
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? { mimeType: 'audio/webm' } : undefined;
-      const recorder = new MediaRecorder(audioStream, mimeType);
-      mediaRecorderRef.current = recorder;
+      // 1. Show interim/final results locally for immediate feedback
+      setActiveCaptions((prev) => ({
+        ...prev,
+        me: {
+          name: 'You',
+          text: final || interim,
+          isInterim: !final,
+          expiresAt: Date.now() + 5000,
+        },
+      }));
 
-      recorder.ondataavailable = async (event) => {
-        if (!event.data || event.data.size === 0 || !isCaptionsOn) {
-          return;
-        }
-
-        try {
-          const transcript = await transcribeAudioChunk(event.data, 'auto');
-          if (!transcript) {
-            return;
-          }
-
-          setActiveCaptions((prev) => ({
-            ...prev,
-            me: {
-              name: 'You',
-              text: transcript,
-              expiresAt: Date.now() + 6000,
-            },
-          }));
-
-          sendCaptionMessage(transcript);
-        } catch (error) {
-          console.error('Caption transcription failed', error);
-        }
-      };
-
-      recorder.start();
-      setTimeout(() => {
-        if (recorder.state === 'recording') {
-          recorder.stop();
-        }
-      }, 8000);
+      // 2. When a sentence is final, broadcast it
+      if (final) {
+        sendCaptionMessage(final);
+      }
     };
 
-    startChunkRecording();
-    transcriptionIntervalRef.current = setInterval(startChunkRecording, 8050);
+    liveCaptionService.start(handleCaptionResult);
 
     return () => {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-        mediaRecorderRef.current.stop();
-      }
-
-      if (transcriptionIntervalRef.current) {
-        clearInterval(transcriptionIntervalRef.current);
-      }
+      liveCaptionService.stop();
     };
   }, [isCaptionsOn, localStream, sendCaptionMessage]);
 
@@ -234,9 +209,13 @@ export default function MeetingRoom() {
             {isCaptionsOn && Object.keys(activeCaptions).length > 0 && (
               <div className="absolute bottom-28 left-1/2 -translate-x-1/2 flex flex-col gap-3 w-full max-w-3xl px-4 z-10">
                 {Object.entries(activeCaptions).map(([id, caption]) => (
-                  <div key={id} className="bg-black/80 backdrop-blur-md px-5 py-3 rounded-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-blue-300 mb-1">{caption.name}</div>
-                    <p className="text-white text-base font-medium">{caption.text}</p>
+                  <div key={id} className={`bg-black/80 backdrop-blur-md px-5 py-3 rounded-xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 border-l-4 ${caption.isInterim ? 'border-blue-400/50 opacity-80' : 'border-blue-500'}`}>
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-blue-300 mb-1">
+                      {caption.name} {caption.isInterim && <span className="normal-case opacity-50 ml-2 italic">Speaking...</span>}
+                    </div>
+                    <p className={`text-base font-medium ${caption.isInterim ? 'text-gray-300' : 'text-white'}`}>
+                      {caption.text}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -345,14 +324,14 @@ export default function MeetingRoom() {
                           <div className="flex items-center gap-2">
                             <button 
                               onClick={() => admitParticipant(req.id)}
-                              className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-500 transition-colors inline-flex items-center gap-1"
+                              className="bg-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-blue-500 transition-colors inline-flex items-center gap-1"
                             >
                               <Check size={14} />
                               Admit
                             </button>
                             <button
                               onClick={() => denyParticipant(req.id)}
-                              className="bg-gray-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-gray-500 transition-colors inline-flex items-center gap-1"
+                              className="bg-gray-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-gray-500 transition-colors inline-flex items-center gap-1"
                             >
                               <X size={14} />
                               Deny

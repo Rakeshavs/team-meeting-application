@@ -38,7 +38,7 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
           />
           <button 
             onClick={handleCopy}
-            className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-500 transition px-4 py-2 rounded-md font-medium"
+            className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-500 transition px-4 py-2 rounded-full font-medium"
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
             {copied ? 'Copied!' : 'Copy'}
@@ -60,7 +60,7 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
               handleCopy();
             }
           }}
-          className="w-full flex items-center justify-center gap-2 text-sm bg-gray-700 hover:bg-gray-600 transition px-4 py-2 text-white rounded-md font-medium"
+          className="w-full flex items-center justify-center gap-2 text-sm bg-gray-700 hover:bg-gray-600 transition px-4 py-2 text-white rounded-full font-medium"
         >
           <Share2 size={16} />
           Share via App

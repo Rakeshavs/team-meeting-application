@@ -136,7 +136,7 @@ export default function LandingPage() {
 />
       
       <div className="flex flex-1 overflow-hidden">
-        {isSidebarOpen && <MeetingSidebar />}
+        {isSidebarOpen && <MeetingSidebar onClose={() => setIsSidebarOpen(false)} />}
         
         <main className="flex-1 flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-12 gap-12 overflow-y-auto ml-[60px]">
           {/* Left Column: Call to Action */}
@@ -154,14 +154,14 @@ export default function LandingPage() {
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
                   disabled={isLoading}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md shadow-md transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
                 >
                   <Video size={18} />
                   {isLoading ? 'Loading...' : 'New meeting'}
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-xl py-2 z-50">
+                  <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-200 rounded-2xl shadow-xl py-2 z-50">
                     <button
                       onClick={handleCreateMeetingLater}
                       className="w-full flex items-center gap-4 px-6 py-3 text-left hover:bg-gray-50 transition-colors group"
@@ -187,10 +187,9 @@ export default function LandingPage() {
                 )}
               </div>
 
-              {/* Join Meeting Button */}
               <button
                 onClick={() => setShowJoinModal(true)}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent border border-gray-300 hover:bg-gray-50 font-medium py-3 px-6 rounded-md shadow-sm transition-all active:scale-95 text-gray-700"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent border border-gray-300 hover:bg-gray-50 font-medium py-3 px-6 rounded-full shadow-sm transition-all active:scale-95 text-gray-700"
               >
                 <Keyboard size={18} className="text-gray-500" />
                 Join a meeting
@@ -221,19 +220,7 @@ export default function LandingPage() {
                   Click <strong>New meeting</strong> to get a link you can send to people you want to meet with
                 </p>
                 
-                <div className="flex items-center gap-4 mt-8">
-                  <button className="p-2 hover:bg-gray-100 rounded-full border border-gray-200 shadow-sm transition-colors">
-                    <ChevronLeft size={20} className="text-gray-500" />
-                  </button>
-                  <div className="flex gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-200"></span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-200"></span>
-                  </div>
-                  <button className="p-2 hover:bg-gray-100 rounded-full border border-gray-200 shadow-sm transition-colors">
-                    <ChevronRight size={20} className="text-gray-500" />
-                  </button>
-                </div>
+
               </div>
             </div>
           </div>
@@ -249,7 +236,7 @@ export default function LandingPage() {
       {/* Join Meeting Modal */}
       {showJoinModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] px-4 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform scale-100 transition-transform">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md transform scale-100 transition-transform">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-medium text-gray-800">Join a meeting</h2>
               <button onClick={() => {setShowJoinModal(false); setMeetingCode(''); setParticipantName('');}} className="text-gray-400 hover:bg-gray-100 rounded-full p-2 transition-colors">
@@ -260,7 +247,7 @@ export default function LandingPage() {
               <input
                 type="text"
                 placeholder="Your name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-700"
+                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-700"
                 value={participantName}
                 onChange={(e) => setParticipantName(e.target.value)}
               />
@@ -271,7 +258,7 @@ export default function LandingPage() {
                 <input
                   type="text"
                   placeholder="Paste meeting link or code"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-700"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-700"
                   value={meetingCode}
                   onChange={(e) => setMeetingCode(e.target.value)}
                   autoFocus
@@ -281,14 +268,14 @@ export default function LandingPage() {
                 <button
                   type="button"
                   onClick={() => {setShowJoinModal(false); setMeetingCode(''); setParticipantName('');}}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!meetingCode.trim() || !participantName.trim()}
-                  className={`px-5 py-2 rounded-lg font-medium transition-all ${meetingCode.trim() && participantName.trim() ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md transform active:scale-95' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                  className={`px-5 py-2 rounded-full font-medium transition-all ${meetingCode.trim() && participantName.trim() ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md transform active:scale-95' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                 >
                   Join
                 </button>

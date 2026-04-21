@@ -191,7 +191,7 @@ export default function LobbyPage() {
                     </h3>
                     <button 
                       onClick={() => { setIsMicOn(true); setIsVideoOn(true); }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-md font-medium transition-all"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-medium transition-all"
                     >
                       Allow microphone and camera
                     </button>
@@ -305,7 +305,7 @@ export default function LobbyPage() {
                             >
                               <Check size={16} />
                             </button>
-                            <button className="p-1.5 bg-gray-200 text-gray-500 rounded-lg hover:bg-gray-300 transition-colors" title="Deny">
+                            <button className="p-1.5 bg-gray-200 text-gray-500 rounded-full hover:bg-gray-300 transition-colors" title="Deny">
                               <X size={16} />
                             </button>
                           </div>
@@ -325,7 +325,7 @@ export default function LobbyPage() {
                   {isWaiting ? 'Waiting to be let in...' : 'Ask to join'}
                 </button>
                 
-                <button className="w-full flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 font-medium py-3 rounded-md border border-gray-200 transition-all text-sm group">
+                <button className="w-full flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 font-medium py-3 rounded-full border border-gray-200 transition-all text-sm group">
                   Other ways to join
                   <ChevronDown size={16} className="text-gray-400 group-hover:text-gray-600" />
                 </button>
