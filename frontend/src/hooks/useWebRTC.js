@@ -434,11 +434,11 @@ export function useWebRTC(roomId, options = {}) {
             const audioTrack = stream.getAudioTracks()[0];
             const videoTrack = stream.getVideoTracks()[0];
 
-            if (audioTrack) audioTrack.enabled = initialMediaState.current.audioEnabled;
-            if (videoTrack) videoTrack.enabled = initialMediaState.current.videoEnabled;
+            // Force enable by default for instant start
+            if (audioTrack) audioTrack.enabled = true;
+            if (videoTrack) videoTrack.enabled = true;
           } catch (mediaErr) {
             console.warn('Media acquisition failed, attempting fallback:', mediaErr.name);
-            // Fallback: try to get ANY available device to trigger a prompt if possible
             try {
                stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch(() => new MediaStream());
             } catch {
@@ -453,11 +453,13 @@ export function useWebRTC(roomId, options = {}) {
           activeStreamsRef.current.push(stream);
 
           if (isMounted) {
-            setLocalStream(stream);
+            // Use a fresh MediaStream to force React to re-render the VideoPlayer
+            setLocalStream(new MediaStream(stream.getTracks()));
+            
             const audioTrack = stream.getAudioTracks()[0];
             const videoTrack = stream.getVideoTracks()[0];
-            setIsAudioEnabled(audioTrack ? audioTrack.enabled : false);
-            setIsVideoEnabled(videoTrack ? videoTrack.enabled : false);
+            setIsAudioEnabled(audioTrack ? audioTrack.enabled : true);
+            setIsVideoEnabled(videoTrack ? videoTrack.enabled : true);
           }
         }
 
@@ -575,6 +577,9 @@ export function useWebRTC(roomId, options = {}) {
         localStream.addTrack(newTrack);
         videoTrack = newTrack;
         
+        // Force state update to refresh local video player
+        setLocalStream(new MediaStream(localStream.getTracks()));
+        
         // Update peer connections with the new track
         Object.values(peerConnections.current).forEach(pc => {
           pc.addTrack(newTrack, localStream);
@@ -605,6 +610,9 @@ export function useWebRTC(roomId, options = {}) {
         const newTrack = newStream.getAudioTracks()[0];
         localStream.addTrack(newTrack);
         audioTrack = newTrack;
+
+        // Force state update to refresh UI
+        setLocalStream(new MediaStream(localStream.getTracks()));
 
         Object.values(peerConnections.current).forEach(pc => {
           pc.addTrack(newTrack, localStream);
