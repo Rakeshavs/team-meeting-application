@@ -9,29 +9,54 @@ function VideoPlayer({
   featured = false,
   compact = false,
 }) {
+  const [isVideoActive, setIsVideoActive] = useState(false);
   const videoRef = useRef(null);
 
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
+      
+      const checkTrack = () => {
+        const videoTrack = stream.getVideoTracks()[0];
+        setIsVideoActive(!!videoTrack && videoTrack.enabled && videoTrack.readyState === 'live');
+      };
+
+      checkTrack();
+      const interval = setInterval(checkTrack, 1000);
+      
+      videoRef.current.play().catch(e => console.debug("Autoplay prevented:", e));
+
+      return () => clearInterval(interval);
+    } else {
+      setIsVideoActive(false);
     }
   }, [stream]);
 
+  const initials = label ? label.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'P';
+
   return (
-    <div className={`relative overflow-hidden shadow-2xl border border-gray-700/50 group flex items-center justify-center ${
-      featured ? 'w-full h-full rounded-3xl bg-black' : 'w-full aspect-video rounded-2xl bg-gray-800'
+    <div className={`relative overflow-hidden shadow-2xl border border-white/5 group flex items-center justify-center ${
+      featured ? 'w-full h-full rounded-3xl bg-black/90' : 'w-full aspect-video rounded-2xl bg-gray-800/50'
     }`}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
         muted={isLocal}
-        className={`w-full h-full ${featured ? 'object-contain bg-black' : 'object-cover'} ${isLocal ? 'transform -scale-x-100' : ''}`}
+        className={`w-full h-full ${featured ? 'object-contain' : 'object-cover'} ${isLocal ? 'transform -scale-x-100' : ''} ${!isVideoActive ? 'hidden' : ''}`}
       />
+
+      {!isVideoActive && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+          <div className="w-20 h-20 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center animate-pulse">
+            <span className="text-2xl font-bold text-blue-400">{initials}</span>
+          </div>
+        </div>
+      )}
 
       {isHandRaised && (
         <div className="absolute top-4 right-4 bg-yellow-500 text-white p-2 rounded-full shadow-lg border-2 border-yellow-400 z-10">
-          <span className="text-xs font-bold">RH</span>
+          <span className="text-xs font-bold text-white">RH</span>
         </div>
       )}
 
