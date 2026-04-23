@@ -14,7 +14,11 @@ const ICE_SERVERS = {
     { urls: 'stun:stun2.l.google.com:19302' },
     { urls: 'stun:stun3.l.google.com:19302' },
     { urls: 'stun:stun4.l.google.com:19302' },
+    { urls: 'stun:stun.voiparound.com' },
+    { urls: 'stun:stun.voipstunt.com' },
+    { urls: 'stun:stun.vuse-beheer.nl' },
   ],
+  iceCandidatePoolSize: 10,
 };
 
 function getStableClientId(roomId) {
@@ -225,10 +229,19 @@ export function useWebRTC(roomId, options = {}) {
     };
 
     pc.oniceconnectionstatechange = () => {
-      console.log(`[WebRTC] ICE state with ${peerId}: ${pc.iceConnectionState}`);
-      if (pc.iceConnectionState === 'failed') {
+      console.log(`[WebRTC] ICE Connection with ${peerId}: ${pc.iceConnectionState}`);
+      if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'disconnected') {
+        console.warn(`[WebRTC] Connection stalled with ${peerId}, attempting ICE restart...`);
         pc.restartIce();
       }
+    };
+
+    pc.onconnectionstatechange = () => {
+       console.log(`[WebRTC] Total Connection State with ${peerId}: ${pc.connectionState}`);
+       if (pc.connectionState === 'failed') {
+         // Force entire renegotiation if connection fails
+         pc.onnegotiationneeded?.();
+       }
     };
 
     pc.ontrack = (event) => {
