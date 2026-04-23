@@ -416,24 +416,32 @@ export function useWebRTC(roomId, options = {}) {
 
       try {
         if (acquireMedia) {
-          const constraints = getPreferredMediaConstraints();
-          const wantsAudio = constraints.audio !== false;
-          const wantsVideo = constraints.video !== false;
+          try {
+            const constraints = getPreferredMediaConstraints();
+            const wantsAudio = constraints.audio !== false;
+            const wantsVideo = constraints.video !== false;
 
-          if (wantsAudio || wantsVideo) {
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-          } else {
+            if (wantsAudio || wantsVideo) {
+              stream = await navigator.mediaDevices.getUserMedia(constraints);
+            } else {
+              stream = new MediaStream();
+            }
+
+            const audioTrack = stream.getAudioTracks()[0];
+            const videoTrack = stream.getVideoTracks()[0];
+
+            if (audioTrack) {
+              audioTrack.enabled = initialMediaState.current.audioEnabled;
+            }
+            if (videoTrack) {
+              videoTrack.enabled = initialMediaState.current.videoEnabled;
+            }
+          } catch (mediaErr) {
+            console.warn('Could not acquire media, joining with empty stream:', mediaErr);
             stream = new MediaStream();
-          }
-
-          const audioTrack = stream.getAudioTracks()[0];
-          const videoTrack = stream.getVideoTracks()[0];
-
-          if (audioTrack) {
-            audioTrack.enabled = initialMediaState.current.audioEnabled;
-          }
-          if (videoTrack) {
-            videoTrack.enabled = initialMediaState.current.videoEnabled;
+            if (isMounted) {
+              setMediaError('No Camera/Mic found (using audio/video off mode)');
+            }
           }
 
           originalStream.current = stream;
@@ -441,8 +449,6 @@ export function useWebRTC(roomId, options = {}) {
 
           if (isMounted) {
             setLocalStream(stream);
-            setIsAudioEnabled(audioTrack ? audioTrack.enabled : false);
-            setIsVideoEnabled(videoTrack ? videoTrack.enabled : false);
           }
         }
 
