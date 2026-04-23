@@ -449,6 +449,10 @@ export function useWebRTC(roomId, options = {}) {
 
           if (isMounted) {
             setLocalStream(stream);
+            const audioTrack = stream.getAudioTracks()[0];
+            const videoTrack = stream.getVideoTracks()[0];
+            setIsAudioEnabled(audioTrack ? audioTrack.enabled : false);
+            setIsVideoEnabled(videoTrack ? videoTrack.enabled : false);
           }
         }
 
