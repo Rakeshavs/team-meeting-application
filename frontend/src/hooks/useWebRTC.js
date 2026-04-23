@@ -417,12 +417,16 @@ export function useWebRTC(roomId, options = {}) {
       try {
         if (acquireMedia) {
           try {
-            const constraints = getPreferredMediaConstraints();
-            const wantsAudio = constraints.audio !== false;
-            const wantsVideo = constraints.video !== false;
+            console.log('Requesting fresh media permissions...');
+            const constraints = {
+              audio: initialMediaState.current.audioEnabled,
+              video: initialMediaState.current.videoEnabled
+            };
 
-            if (wantsAudio || wantsVideo) {
+            // Force a prompt if any track is requested
+            if (constraints.audio || constraints.video) {
               stream = await navigator.mediaDevices.getUserMedia(constraints);
+              console.log('Media permissions granted successfully');
             } else {
               stream = new MediaStream();
             }
@@ -430,17 +434,18 @@ export function useWebRTC(roomId, options = {}) {
             const audioTrack = stream.getAudioTracks()[0];
             const videoTrack = stream.getVideoTracks()[0];
 
-            if (audioTrack) {
-              audioTrack.enabled = initialMediaState.current.audioEnabled;
-            }
-            if (videoTrack) {
-              videoTrack.enabled = initialMediaState.current.videoEnabled;
-            }
+            if (audioTrack) audioTrack.enabled = initialMediaState.current.audioEnabled;
+            if (videoTrack) videoTrack.enabled = initialMediaState.current.videoEnabled;
           } catch (mediaErr) {
-            console.warn('Could not acquire media, joining with empty stream:', mediaErr);
-            stream = new MediaStream();
+            console.warn('Media acquisition failed, attempting fallback:', mediaErr.name);
+            // Fallback: try to get ANY available device to trigger a prompt if possible
+            try {
+               stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch(() => new MediaStream());
+            } catch {
+               stream = new MediaStream();
+            }
             if (isMounted) {
-              setMediaError('No Camera/Mic found (using audio/video off mode)');
+              setMediaError(`Camera/Mic error: ${mediaErr.name}`);
             }
           }
 
@@ -558,36 +563,63 @@ export function useWebRTC(roomId, options = {}) {
     sendSignalingMessage({ type: 'join-request', name });
   }, [roomId, sendSignalingMessage]);
 
-  const toggleVideo = useCallback(() => {
-    if (!localStream) {
-      setIsVideoEnabled((prev) => !prev);
-      return;
+  const toggleVideo = useCallback(async () => {
+    if (!localStream) return;
+
+    let videoTrack = localStream.getVideoTracks()[0];
+    
+    if (!videoTrack) {
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const newTrack = newStream.getVideoTracks()[0];
+        localStream.addTrack(newTrack);
+        videoTrack = newTrack;
+        
+        // Update peer connections with the new track
+        Object.values(peerConnections.current).forEach(pc => {
+          pc.addTrack(newTrack, localStream);
+          pc.createOffer().then(offer => pc.setLocalDescription(offer))
+            .then(() => sendSignalingMessage({ type: 'offer', target: pc.peerId, offer: pc.localDescription }));
+        });
+      } catch (err) {
+        console.error("Failed to acquire video track:", err);
+        setMediaError("Permission Denied: Camera");
+        return;
+      }
     }
 
-    const videoTrack = localStream.getVideoTracks()[0];
     if (videoTrack) {
       videoTrack.enabled = !videoTrack.enabled;
       setIsVideoEnabled(videoTrack.enabled);
-      return;
+    }
+  }, [localStream, sendSignalingMessage]);
+
+  const toggleAudio = useCallback(async () => {
+    if (!localStream) return;
+
+    let audioTrack = localStream.getAudioTracks()[0];
+    
+    if (!audioTrack) {
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const newTrack = newStream.getAudioTracks()[0];
+        localStream.addTrack(newTrack);
+        audioTrack = newTrack;
+
+        Object.values(peerConnections.current).forEach(pc => {
+          pc.addTrack(newTrack, localStream);
+        });
+      } catch (err) {
+        console.error("Failed to acquire audio track:", err);
+        setMediaError("Permission Denied: Microphone");
+        return;
+      }
     }
 
-    setIsVideoEnabled((prev) => !prev);
-  }, [localStream]);
-
-  const toggleAudio = useCallback(() => {
-    if (!localStream) {
-      setIsAudioEnabled((prev) => !prev);
-      return;
-    }
-
-    const audioTrack = localStream.getAudioTracks()[0];
     if (audioTrack) {
       audioTrack.enabled = !audioTrack.enabled;
       setIsAudioEnabled(audioTrack.enabled);
-      return;
     }
-
-    setIsAudioEnabled((prev) => !prev);
   }, [localStream]);
 
   const stopScreenShare = useCallback((screenTrack) => {
