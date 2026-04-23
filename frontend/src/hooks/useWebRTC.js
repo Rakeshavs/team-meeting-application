@@ -264,6 +264,9 @@ export function useWebRTC(roomId, options = {}) {
     const { type, sender, target, offer, answer, candidate, name } = data;
     const peerId = sender || data.client_id;
 
+    // CRITICAL: Block self-signaling to prevent ghost connections
+    if (!peerId || peerId === clientId.current) return;
+    
     if (target && target !== clientId.current) return;
 
     try {
