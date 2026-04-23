@@ -317,7 +317,8 @@ export function useWebRTC(roomId, options = {}) {
       }
 
       case 'chat':
-        addMessage({ sender: data.sender, text: data.text });
+        const senderName = data.senderName || participantsMetadata[peerId]?.name || 'Participant';
+        addMessage({ sender: senderName, text: data.text });
         break;
 
       case 'caption':
@@ -722,7 +723,11 @@ export function useWebRTC(roomId, options = {}) {
   }, [isHandRaised, isSharingScreen, sendSignalingMessage]);
 
   const sendChatMessage = useCallback((text) => {
-    sendSignalingMessage({ type: 'chat', text });
+    sendSignalingMessage({ 
+      type: 'chat', 
+      text,
+      senderName: displayName.current 
+    });
     addMessage({ sender: 'Me', text });
   }, [addMessage, sendSignalingMessage]);
 

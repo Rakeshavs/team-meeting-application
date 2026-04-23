@@ -66,6 +66,9 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, client_id: str)
             if target_id:
                 pass
 
+            if msg_type == "chat":
+                logger.info(f"Chat message from {client_id} in room {room_id}")
+
             await manager.broadcast_to_room(room_id, message_to_send, sender=websocket)
 
             # --- AI Chatbot Interception ---
