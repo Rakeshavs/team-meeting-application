@@ -444,6 +444,7 @@ export function useWebRTC(roomId, options = {}) {
 
   useEffect(() => {
     let isMounted = true;
+    let heartbeatInterval = null;
 
     const startConnection = async () => {
       let stream = null;
@@ -483,6 +484,8 @@ export function useWebRTC(roomId, options = {}) {
         ws.current = new WebSocket(buildWebSocketUrl(`/ws/${roomId}/${clientId.current}`));
 
         ws.current.onopen = () => {
+          console.log('Connected to signaling server');
+          
           pendingMessagesRef.current.forEach((message) => {
             ws.current?.send(JSON.stringify(message));
           });
@@ -495,11 +498,24 @@ export function useWebRTC(roomId, options = {}) {
           if (autoJoin) {
             joinRoomCallbackRef.current?.();
           }
+
+          // Start heartbeat to keep connection alive on Render (avoids 30s timeout)
+          heartbeatInterval = setInterval(() => {
+            if (ws.current?.readyState === WebSocket.OPEN) {
+              ws.current.send(JSON.stringify({ type: 'ping' }));
+            }
+          }, 20000);
         };
 
         ws.current.onmessage = async (event) => {
           const message = JSON.parse(event.data);
+          if (message.type === 'pong') return; // Ignore pong responses
           await handleSignalingDataRef.current?.(message, stream || originalStream.current);
+        };
+
+        ws.current.onclose = () => {
+          if (heartbeatInterval) clearInterval(heartbeatInterval);
+          console.log('Disconnected from signaling server');
         };
       } catch (error) {
         console.error('Error starting WebRTC connection.', error);
@@ -513,6 +529,7 @@ export function useWebRTC(roomId, options = {}) {
 
     return () => {
       isMounted = false;
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
 
       if (ws.current) {
         ws.current.close();

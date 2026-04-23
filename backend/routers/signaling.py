@@ -22,6 +22,10 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str, client_id: str)
             msg_type = data.get("type")
             target_id = data.get("target")
 
+            if msg_type == "ping":
+                await manager.send_to_websocket(websocket, {"type": "pong"})
+                continue
+
             if msg_type == "join-room":
                 if data.get("role") == "host":
                     await manager.send_to_websocket(websocket, {
