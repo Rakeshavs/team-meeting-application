@@ -40,7 +40,7 @@ export default function MeetingRoom() {
   const mediaRecorderRef = useRef(null);
   const transcriptionIntervalRef = useRef(null);
   const [chatInput, setChatInput] = useState('');
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
