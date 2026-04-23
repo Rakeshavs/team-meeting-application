@@ -11,6 +11,9 @@ const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
   ],
 };
 
@@ -92,6 +95,7 @@ export function useWebRTC(roomId, options = {}) {
   const joinRoomCallbackRef = useRef(null);
   const handleSignalingDataRef = useRef(null);
   const pendingMessagesRef = useRef([]);
+  const pendingCandidates = useRef({});
 
   const addMessage = useCallback((msg) => {
     setMessages((prev) => [...prev, msg]);
@@ -259,12 +263,16 @@ export function useWebRTC(roomId, options = {}) {
           return;
         }
 
-        const pcOffer = createPeerConnection(peerId, stream);
-        if (!pcOffer) {
-          return;
+        await pcOffer.setRemoteDescription(new RTCSessionDescription(data.offer));
+        
+        // Drain pending candidates
+        if (pendingCandidates.current[peerId]) {
+          pendingCandidates.current[peerId].forEach(async (candidate) => {
+            await pcOffer.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
+          });
+          delete pendingCandidates.current[peerId];
         }
 
-        await pcOffer.setRemoteDescription(new RTCSessionDescription(data.offer));
         const answer = await pcOffer.createAnswer();
         await pcOffer.setLocalDescription(answer);
         sendSignalingMessage({ type: 'answer', target: peerId, answer });
@@ -275,18 +283,29 @@ export function useWebRTC(roomId, options = {}) {
         const pcAnswer = peerConnections.current[peerId];
         if (pcAnswer && pcAnswer.signalingState !== 'stable') {
           await pcAnswer.setRemoteDescription(new RTCSessionDescription(data.answer));
+          
+          // Drain pending candidates
+          if (pendingCandidates.current[peerId]) {
+            pendingCandidates.current[peerId].forEach(async (candidate) => {
+              await pcAnswer.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
+            });
+            delete pendingCandidates.current[peerId];
+          }
         }
         break;
       }
 
       case 'ice-candidate': {
         const pcIce = peerConnections.current[peerId];
-        if (pcIce) {
+        if (pcIce && pcIce.remoteDescription) {
           try {
             await pcIce.addIceCandidate(new RTCIceCandidate(data.candidate));
           } catch (error) {
             console.error('Error adding received ice candidate', error);
           }
+        } else {
+          if (!pendingCandidates.current[peerId]) pendingCandidates.current[peerId] = [];
+          pendingCandidates.current[peerId].push(data.candidate);
         }
         break;
       }
