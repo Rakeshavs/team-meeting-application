@@ -445,35 +445,25 @@ export function useWebRTC(roomId, options = {}) {
       try {
         if (acquireMedia) {
           try {
-            console.log('Requesting fresh media permissions...');
+            console.log('Requesting fresh media permissions for participant...');
             const constraints = {
-              audio: initialMediaState.current.audioEnabled,
-              video: initialMediaState.current.videoEnabled
+              audio: true, // Force prompt for both to ensure 'Google Meet' experience
+              video: true
             };
 
-            // Force a prompt if any track is requested
-            if (constraints.audio || constraints.video) {
-              stream = await navigator.mediaDevices.getUserMedia(constraints);
-              console.log('Media permissions granted successfully');
-            } else {
-              stream = new MediaStream();
-            }
-
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            console.log('Media permissions granted successfully');
+            
             const audioTrack = stream.getAudioTracks()[0];
             const videoTrack = stream.getVideoTracks()[0];
 
-            // Force enable by default for instant start
             if (audioTrack) audioTrack.enabled = true;
             if (videoTrack) videoTrack.enabled = true;
           } catch (mediaErr) {
-            console.warn('Media acquisition failed, attempting fallback:', mediaErr.name);
-            try {
-               stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).catch(() => new MediaStream());
-            } catch {
-               stream = new MediaStream();
-            }
+            console.warn('Initial media acquisition failed, joining with empty stream:', mediaErr.name);
+            stream = new MediaStream();
             if (isMounted) {
-              setMediaError(`Camera/Mic error: ${mediaErr.name}`);
+              setMediaError(`Media Error: ${mediaErr.name}. Please ensure camera/mic are not in use by another app.`);
             }
           }
 
@@ -481,9 +471,7 @@ export function useWebRTC(roomId, options = {}) {
           activeStreamsRef.current.push(stream);
 
           if (isMounted) {
-            // Use a fresh MediaStream to force React to re-render the VideoPlayer
             setLocalStream(new MediaStream(stream.getTracks()));
-            
             const audioTrack = stream.getAudioTracks()[0];
             const videoTrack = stream.getVideoTracks()[0];
             setIsAudioEnabled(audioTrack ? audioTrack.enabled : true);
