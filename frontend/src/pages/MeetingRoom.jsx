@@ -40,14 +40,7 @@ export default function MeetingRoom() {
   const mediaRecorderRef = useRef(null);
   const transcriptionIntervalRef = useRef(null);
   const [chatInput, setChatInput] = useState('');
-  const messagesEndRef = useRef(null);
-  const isAdmitted = sessionStorage.getItem(`meeting_admitted_${roomId}`) === 'true';
-
-  useEffect(() => {
-    if (!isHost && !isAdmitted) {
-      navigate(`/room/${roomId}`, { replace: true });
-    }
-  }, [isAdmitted, isHost, navigate, roomId]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleSendMessage = (e) => {
     e.preventDefault();

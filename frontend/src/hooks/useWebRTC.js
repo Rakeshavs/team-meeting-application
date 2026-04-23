@@ -228,12 +228,9 @@ export function useWebRTC(roomId, options = {}) {
 
     switch (type) {
       case 'user-joined': {
-        if (!stream) {
-          return;
-        }
-
         const pc = createPeerConnection(peerId, stream);
         if (!pc) {
+          // If stream isn't ready yet, we will retry when it becomes available
           return;
         }
 
@@ -387,39 +384,6 @@ export function useWebRTC(roomId, options = {}) {
             isSharingScreen: typeof data.isSharingScreen === 'boolean' ? data.isSharingScreen : prev[peerId]?.isSharingScreen,
           },
         }));
-        break;
-
-      case 'join-request':
-        if (isHost.current) {
-          setActiveJoinRequests((prev) => {
-            if (prev.find((request) => request.id === peerId)) {
-              return prev;
-            }
-
-            return [
-              ...prev,
-              {
-                id: peerId,
-                name: data.name || 'Participant',
-              },
-            ];
-          });
-        }
-        break;
-
-      case 'waiting-room-sync':
-        if (isHost.current) {
-          setActiveJoinRequests(Array.isArray(data.requests) ? data.requests : []);
-        }
-        break;
-
-      case 'admit':
-        sessionStorage.setItem(`meeting_admitted_${roomId}`, 'true');
-        window.dispatchEvent(new CustomEvent('meeting-admitted', { detail: { roomId } }));
-        break;
-
-      case 'deny':
-        window.dispatchEvent(new CustomEvent('meeting-denied', { detail: { roomId } }));
         break;
 
       default:

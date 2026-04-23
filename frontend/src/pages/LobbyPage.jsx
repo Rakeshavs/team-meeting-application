@@ -149,17 +149,13 @@ export default function LobbyPage() {
     };
   }, [roomId]);
 
-  const handleAskToJoin = () => {
-    setIsWaiting(true);
-    requestToJoin(storedParticipantName);
-    showToast("Join request sent. Waiting for host...");
-  };
-
   const joinMeeting = () => {
     savePreJoinMediaState(roomId, { audioEnabled: isMicOn, videoEnabled: isVideoOn });
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
     }
+    // Always mark as admitted for direct join
+    sessionStorage.setItem(`meeting_admitted_${roomId}`, 'true');
     navigate(`/meeting/${roomId}`);
   };
 
@@ -267,70 +263,23 @@ export default function LobbyPage() {
 
 
           <div className="w-full space-y-4 pt-4">
-            {isHost ? (
-              <div className="space-y-4 w-full">
-                <button 
-                  onClick={joinMeeting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-full shadow-lg shadow-blue-100 transition-all transform active:scale-95 text-md flex items-center justify-center gap-2"
-                >
-                  <LogIn size={20} />
-                  Start Meeting
-                </button>
+            <div className="space-y-4 w-full">
+              <button 
+                onClick={joinMeeting}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-full shadow-lg shadow-blue-100 transition-all transform active:scale-95 text-md flex items-center justify-center gap-2"
+              >
+                <LogIn size={20} />
+                Join Meeting
+              </button>
 
-                <button 
-                  onClick={() => setShowInviteModal(true)}
-                  className="w-full bg-white border border-gray-300 text-gray-700 font-medium py-3 rounded-full hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-                >
-                  <Link size={18} />
-                  Invite people
-                </button>
-                
-                {activeJoinRequests.length > 0 && (
-                  <div className="mt-8 text-left animate-in slide-in-from-bottom-4 duration-500">
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Waiting to join ({activeJoinRequests.length})</h3>
-                    <div className="space-y-2">
-                      {activeJoinRequests.map(req => (
-                        <div key={req.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
-                              {req.name.charAt(0)}
-                            </div>
-                            <span className="text-sm font-medium text-gray-700">{req.name}</span>
-                          </div>
-                          <div className="flex gap-2">
-                            <button 
-                              onClick={() => admitParticipant(req.id)}
-                              className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                              title="Admit"
-                            >
-                              <Check size={16} />
-                            </button>
-                            <button className="p-1.5 bg-gray-200 text-gray-500 rounded-full hover:bg-gray-300 transition-colors" title="Deny">
-                              <X size={16} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <button 
-                  onClick={handleAskToJoin}
-                  disabled={isWaiting}
-                  className={`w-full font-semibold py-3.5 rounded-full shadow-lg transition-all transform active:scale-95 text-md ${isWaiting ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-100'}`}
-                >
-                  {isWaiting ? 'Waiting to be let in...' : 'Ask to join'}
-                </button>
-                
-                <button className="w-full flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100 font-medium py-3 rounded-full border border-gray-200 transition-all text-sm group">
-                  Other ways to join
-                  <ChevronDown size={16} className="text-gray-400 group-hover:text-gray-600" />
-                </button>
-              </>
-            )}
+              <button 
+                onClick={() => setShowInviteModal(true)}
+                className="w-full bg-white border border-gray-300 text-gray-700 font-medium py-3 rounded-full hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+              >
+                <Link size={18} />
+                Invite people
+              </button>
+            </div>
           </div>
         </div>
       </main>
